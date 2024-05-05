@@ -4,6 +4,7 @@ import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import quranData from '../assets/HilaliTranslation.json';
 import AudioBar from './AudioBar';
+import ScreenUI from './ScreenUI';
 
 const SurahScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -55,6 +56,8 @@ const SurahScreen = ({ route, navigation }) => {
     const fileName = `${chapterStr}${verseStr}.mp3`;
     const localFilePath = `${FileSystem.documentDirectory}${fileName}`;
 
+    console.log("localFilePath is : ", localFilePath);
+
     // Check if the audio file exists locally
     const localFileExists = await FileSystem.getInfoAsync(localFilePath);
     if (localFileExists.exists) {
@@ -83,6 +86,7 @@ const SurahScreen = ({ route, navigation }) => {
           localFilePath
         );
         const { uri } = await downloadResumable.downloadAsync();
+        console.log("uri is : ", uri);
         console.log('Downloaded Sound', fileName);
         if (sound) {
           await sound.unloadAsync();
@@ -98,6 +102,8 @@ const SurahScreen = ({ route, navigation }) => {
         console.error('Error:', error);
       }
     }
+    // const ans = await downloadFile(audioUrl, fileName);
+    console.log("ans is : ", ans);
     updateSelectedVerse(chapter, verse);
   };
 
@@ -158,22 +164,21 @@ const SurahScreen = ({ route, navigation }) => {
 
   const verses = quranData.quran.filter((verse) => verse.chapter === id);
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleClick(item.chapter, item.verse)}>
-      <View key={`${item.chapter}-${item.verse}`} style={selectedVerse == item.verse ? styles.selected:styles.verseContainer}>
-        <Text>{item.verse}. {item.text} {selectedVerse}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  // const renderItem = ({ item }) => (
+  //   <TouchableOpacity onPress={() => handleClick(item.chapter, item.verse)}>
+  //     <View key={`${item.chapter}-${item.verse}`} style={selectedVerse == item.verse ? styles.selected:styles.verseContainer}>
+  //       <Text>{item.verse}. {item.text} {selectedVerse}</Text>
+  //     </View>
+  //   </TouchableOpacity>
+  // );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Verses of Chapter {id}</Text>
-      <FlatList
-        data={verses}
-        extraData={selectedVerse}
-        renderItem={renderItem}
-        keyExtractor={(item) => `${item.chapter}-${item.verse}`}
+      <ScreenUI
+        id = {id}
+        verses={verses}
+        selectedVerse={selectedVerse}
+        handleClick = {handleClick}
       />
       <AudioBar
         isPlaying={isPlaying}
@@ -196,22 +201,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 20,
     textAlign: 'center',
-  },
-  verseContainer: {
-    backgroundColor: '#ffffff',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#dddddd',
-  },
-  selected: {
-    backgroundColor: 'rgba(120, 120, 120, 0.5)',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#dddddd',
   }
 });
 
