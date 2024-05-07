@@ -1,0 +1,10 @@
+1. Add arabic text
+2. Add settings page
+3. use settings to update global state
+4. font size, type can be adjusted.
+5. calling different apis depending on the settings.
+6. download options like surah, ruku, juz for audio
+7. Different recitations one should be able to download
+8. download bar should be visible.
+9. Use different apis to call for different data and show it in that way on UI like page, surah, juz etc.
+10. Show and hide audio bar and enable and disable it.

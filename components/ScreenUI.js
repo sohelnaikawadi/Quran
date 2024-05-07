@@ -9,7 +9,7 @@ const  ScreenUI = ({ id , verses, selectedVerse, handleClick}) => {
 const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleClick(item.chapter, item.verse)}>
         <View key={`${item.chapter}-${item.verse}`} style={selectedVerse == item.verse ? styles.selected:styles.verseContainer}>
-            <Text>{item.verse}. {item.text} {selectedVerse}</Text>
+            <Text>{item.verse}. {item.text}</Text>
         </View>
     </TouchableOpacity>
 );
