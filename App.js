@@ -24,15 +24,31 @@ import SurahScreen from './components/SurahScreen';
 
 const Stack = createStackNavigator();
 
+// const store = createStore(rootReducer, applyMiddleware(thunk, storageMiddleware));
+
+// const store = createStore(rootReducer);
+
+
+// useEffect(() => {
+//     const initializeApp = async () => {
+//       // Dispatch an action to initialize the app with the loaded settings
+//       store.dispatch(initializeApp());
+//     };
+//     initializeApp();
+// }, []);
+
+
 
 const App = () => {
   return (
-    <NavigationContainer>
-    <Stack.Navigator>
-      <Stack.Screen name="Main" component={Main} options={{ headerShown: false }} />
-      <Stack.Screen name="SurahScreen" component={SurahScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  </NavigationContainer>
+    // <Provider store = {store}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Main" component={Main} options={{ headerShown: false }} />
+          <Stack.Screen name="SurahScreen" component={SurahScreen} options={{ headerShown: false }} />
+        </Stack.Navigator>
+    </NavigationContainer>
+  // </Provider>
   );
 };
 

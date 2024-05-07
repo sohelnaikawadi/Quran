@@ -5,6 +5,8 @@ import * as FileSystem from 'expo-file-system';
 import quranData from '../assets/HilaliTranslation.json';
 import AudioBar from './AudioBar';
 import ScreenUI from './ScreenUI';
+import useLocalStorage from './useLocalStorage';
+import useAudioPlayer from './useAudioPlayer';
 
 const SurahScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -14,6 +16,8 @@ const SurahScreen = ({ route, navigation }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedVerse, setSelectedVerse] = useState([]);
+  const {downloadAndSaveAudio} = useLocalStorage();
+  const {playSound} = useAudioPlayer();
 
   useEffect(() => {
     setIsMounted(true);
@@ -34,7 +38,7 @@ const SurahScreen = ({ route, navigation }) => {
         if (status.didJustFinish && currentIndex + 1 < verses.length) {
           setCurrentIndex(prevIndex => prevIndex + 1);
           const { chapter, verse } = verses[currentIndex + 1];
-          playSound(chapter, verse);
+          playSoundForChapterAndVerse(chapter, verse);
         }
       });
     }
@@ -49,69 +53,31 @@ const SurahScreen = ({ route, navigation }) => {
     return unsubscribe;
   }, [navigation, sound]);
 
-  const playSound = async (chapter, verse) => {
+  const playSoundForChapterAndVerse = async (chapter, verse) => {
     setCurrentIndex(verse - 1);
     const chapterStr = chapter.toString().padStart(3, '0');
     const verseStr = verse.toString().padStart(3, '0');
     const fileName = `${chapterStr}${verseStr}.mp3`;
     const localFilePath = `${FileSystem.documentDirectory}${fileName}`;
 
-    console.log("localFilePath is : ", localFilePath);
+    console.log("hello1");
 
-    // Check if the audio file exists locally
-    const localFileExists = await FileSystem.getInfoAsync(localFilePath);
-    if (localFileExists.exists) {
-      console.log('Using local audio file:', fileName);
-      try {
-        if (sound) {
-          await sound.unloadAsync();
-        }
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: localFilePath },
-          { shouldPlay: true }
-        );
-        setSound(newSound);
-        setIsPlaying(true);
-        console.log('Playing Sound');
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    } else {
-      // Download the audio file
-      const audioUrl = `https://verses.quran.com/AbdulBaset/Mujawwad/mp3/${fileName}`;
-      console.log('Downloading Sound', fileName);
-      try {
-        const downloadResumable = FileSystem.createDownloadResumable(
-          audioUrl,
-          localFilePath
-        );
-        const { uri } = await downloadResumable.downloadAsync();
-        console.log("uri is : ", uri);
-        console.log('Downloaded Sound', fileName);
-        if (sound) {
-          await sound.unloadAsync();
-        }
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri },
-          { shouldPlay: true }
-        );
-        setSound(newSound);
-        setIsPlaying(true);
-        console.log('Playing Sound');
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
-    // const ans = await downloadFile(audioUrl, fileName);
-    console.log("ans is : ", ans);
+
+    const [newSound, isPlaying] = await playSound(chapter, verse, localFilePath, fileName, sound);
+
+    console.log("hello");
+
+    setSound(newSound);
+    setIsPlaying(isPlaying);
     updateSelectedVerse(chapter, verse);
+    console.log("selected verse is: ", selectedVerse);
   };
 
   const handlePlayPause = async () => {
     if (!sound) {
       // Load the sound if it's not already loaded
       const { chapter, verse } = verses[currentIndex];
-      await playSound(chapter, verse);
+      await playSoundForChapterAndVerse(chapter, verse);
     }
     else if (sound) {
       if (isPlaying) {
@@ -126,14 +92,14 @@ const SurahScreen = ({ route, navigation }) => {
   const handleNext = () => {
     if (currentIndex + 1 < verses.length) {
       const { chapter, verse } = verses[currentIndex + 1];
-      playSound(chapter, verse);
+      playSoundForChapterAndVerse(chapter, verse);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
       const { chapter, verse } = verses[currentIndex - 1];
-      playSound(chapter, verse);
+      playSoundForChapterAndVerse(chapter, verse);
     }
   };
 
@@ -158,7 +124,7 @@ const SurahScreen = ({ route, navigation }) => {
   }
 
   const handleClick = async(chapter, verse) => {
-    playSound(chapter, verse);
+    playSoundForChapterAndVerse(chapter, verse);
     updateSelectedVerse(chapter, verse);
   }
 
@@ -201,6 +167,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 20,
     textAlign: 'center',
+  },
+  verseContainer: {
+    backgroundColor: '#ffffff',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dddddd',
+  },
+  selected: {
+    backgroundColor: 'rgba(120, 120, 120, 0.5)',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dddddd',
   }
 });
 
