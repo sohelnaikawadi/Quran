@@ -3,13 +3,6 @@ import Main from './components/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import SurahScreen from './components/SurahScreen';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import rootReducer from './components/reducers';
-import storageMiddleware from './components/middleware/storageMiddleware';
-import { useEffect } from 'react';
-import { initializeApp } from './components/actions';
-import thunk from 'redux-thunk';
 
 // export default function App() {
 //   return (
@@ -33,7 +26,7 @@ const Stack = createStackNavigator();
 
 // const store = createStore(rootReducer, applyMiddleware(thunk, storageMiddleware));
 
-const store = createStore(rootReducer);
+// const store = createStore(rootReducer);
 
 
 // useEffect(() => {
